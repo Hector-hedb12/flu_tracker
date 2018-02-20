@@ -1,5 +1,6 @@
-Flu Tracker
-===========
+=============
+ Flu Tracker
+=============
 
 The Flu Tracker ...
 
@@ -11,59 +12,94 @@ The Flu Tracker ...
 :License: MIT
 
 
-Settings
---------
-
-Moved to settings_.
-
-.. _settings: http://cookiecutter-django.readthedocs.io/en/latest/settings.html
-
-Basic Commands
+Project Layout
 --------------
 
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
+This project follows the three-tired approach specified in
+*Two Scoops of Django - Best Practices for Django 2.0*::
 
-* To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
-
-* To create an **superuser account**, use this command::
-
-    $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-Test coverage
-^^^^^^^^^^^^^
-
-To run the tests, check your test coverage, and generate an HTML coverage report::
-
-    $ coverage run manage.py test
-    $ coverage html
-    $ open htmlcov/index.html
-
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
-
-  $ py.test
-
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Moved to `Live reloading and SASS compilation`_.
-
-.. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
+     <repository_root>/
+        <django_project_root>/
+           <configuration_root>/
 
 
 
+Pre-Installations
+-----------------
+
+1. Install pip::
+
+     $ sudo apt-get install python-pip python-dev build-essential
+
+#. Install virtualenv::
+
+     $ sudo pip install virtualenvwrapper
+
+#. Add to end of file ``~/.bashrc`` this line::
+
+     $ source /usr/local/bin/virtualenvwrapper.sh
+
+#. Install postgresql, libraries and header for C language backend development (change ``X.Y`` to a version number)::
+
+     $ sudo apt-get install postgresql-X.Y postgresql-server-dev-X.Y
+
+#. Restart terminal
 
 
-Deployment
-----------
+Project configurations
+----------------------
 
-The following details how to deploy this application.
+1. Open psql console::
+
+     $ sudo -u postgres psql
+
+#. Create flu_tracker database::
+
+     # create database flu_tracker;
+
+#. Create flu_tracker user::
+
+     # create user flu_tracker with password 'flu_tracker_pass' createdb;
+
+#. Grant all available privileges to user flu_tracker on flu_tracker database::
+
+     # grant all privileges on database flu_tracker to flu_tracker;
+
+#. Exit psql console::
+
+     # \q
 
 
+Project Installations
+---------------------
+
+1. Go to repostory root directory ``flu_tracker/``
+#. Create a virtualenv for the project::
+
+     $ mkvirtualenv flu_tracker
+
+#. Install requeriments::
+
+     $ pip install -r requirements/local.txt
+
+#. Run migrations::
+
+     $ python manage.py migrate
+
+#. Create superuser::
+
+     $ python manage.py createsuperuser
 
 
+Run Project
+-----------
+
+1. Activate enviorment::
+
+     $ workon flu_tracker
+
+#. Open a new terminal, go to the repostory root directory ``flu_tracker/``, at the same level of ``manage.py`` file and execute::
+
+     $ python manage.py runserver
+
+#. That's it ! You can open localhost in a browser, and sign in with the user and password created in Project Installations section.
