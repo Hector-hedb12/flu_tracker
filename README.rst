@@ -65,6 +65,10 @@ Project configurations
 
      # grant all privileges on database flu_tracker to flu_tracker;
 
+#. Create ``postgis`` extension::
+
+     # create extension postgis;
+
 #. Exit psql console::
 
      # \q
