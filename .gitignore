@@ -306,3 +306,5 @@ pip-selfcheck.json
 flu_tracker/media/
 
 
+# Apps data
+flu_tracker/world/data
