@@ -41,7 +41,7 @@ Pre-Installations
 
 #. Install postgresql, libraries and header for C language backend development (change ``X.Y`` to a version number)::
 
-     $ sudo apt-get install postgresql-X.Y postgresql-server-dev-X.Y
+     $ sudo apt-get install postgresql-X.Y postgresql-server-dev-X.Y postgresql-X.Y-postgis-scripts
 
 #. Restart terminal
 
