@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^users/', include('flu_tracker.users.urls', namespace='users')),
     url(r'^accounts/', include('allauth.urls')),
 
-    # Your stuff: custom urls includes go here
+    url(r'^world/', include('flu_tracker.world.urls', namespace='world')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

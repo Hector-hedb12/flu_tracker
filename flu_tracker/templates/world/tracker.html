@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Tracker{% endblock %}
+
+{% block css %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock css %}
+
+{% block content %}
+<form class="form-horizontal" method="post" action="{% url 'world:list' %}">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn">Retrieve</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
