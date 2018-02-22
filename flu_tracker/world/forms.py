@@ -1,6 +1,8 @@
 from django.contrib.gis import forms
 from django.contrib.gis.geos import GEOSGeometry
 
+from .widgets import ReadonlyOSMWidget
+
 
 SAMPLE_COLLECTION = GEOSGeometry("SRID=4326;GEOMETRYCOLLECTION("
                                  "POINT(5.625 -0.263671875),"
@@ -25,9 +27,8 @@ class PolygonForm(forms.Form):
 
 class TrackerForm(forms.Form):
     collection = forms.GeometryCollectionField(
-        widget=forms.OSMWidget(attrs={
+        widget=ReadonlyOSMWidget(attrs={
             'map_width': 800,
-            'map_height': 500,
-            'disabled': True
+            'map_height': 500
         })
     )
