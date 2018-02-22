@@ -1,7 +1,9 @@
+from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import render
 from django.views.generic.edit import FormView
 
-from .forms import PolygonForm, TrackerForm, SAMPLE_COLLECTION
+
+from .forms import PolygonForm, TrackerForm
 
 
 class TrackerView(FormView):
@@ -11,5 +13,11 @@ class TrackerView(FormView):
     success_url = '/results/'
 
     def form_valid(self, form):
-        result_form = TrackerForm(data={'collection': SAMPLE_COLLECTION})
+        polygon = form.cleaned_data.get('poly')
+        collection = GEOSGeometry(
+            'GEOMETRYCOLLECTION({})'.format(polygon.wkt),
+            srid=polygon.srid
+        )
+
+        result_form = TrackerForm(data={'collection': collection})
         return render(self.request, self.results_template_name, {'form': result_form})
