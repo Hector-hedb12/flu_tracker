@@ -2,7 +2,7 @@ from django.contrib.gis.forms import OSMWidget
 
 
 class ReadonlyOSMWidget(OSMWidget):
-    template_name = 'gis/openlayers-readonly-osm.html'
+    template_name = 'widgets/openlayers-readonly-osm.html'
     disabled = True
 
     def __init__(self, attrs=None):
