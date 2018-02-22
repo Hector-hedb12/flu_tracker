@@ -13,14 +13,14 @@ from .base import *  # noqa
 
 # DEBUG
 # ------------------------------------------------------------------------------
-DEBUG = env.bool('DJANGO_DEBUG', default=True)
-TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
+DEBUG = env.bool('DJANGO_DEBUG', default=True)  # noqa: F405
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG        # noqa: F405
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
-SECRET_KEY = env('DJANGO_SECRET_KEY', default='420E92QZ9QTIQFXNWPKlGTROsIFygOngFUO1wX0fkw36uVRwOh')
+SECRET_KEY = env('DJANGO_SECRET_KEY', default='420E92QZ9QTIQFXNWPKlGTROsIFygOngFUO1wX0fkw36uVRwOh')  # noqa: F405
 
 # Mail settings
 # ------------------------------------------------------------------------------
@@ -28,8 +28,10 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='420E92QZ9QTIQFXNWPKlGTROsIFygOngF
 EMAIL_PORT = 1025
 
 EMAIL_HOST = 'localhost'
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
-                    default='django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = env(            # noqa: F405
+    'DJANGO_EMAIL_BACKEND',
+    default='django.core.mail.backends.console.EmailBackend'
+)
 
 
 # CACHING
@@ -43,8 +45,8 @@ CACHES = {
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
-MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
-INSTALLED_APPS += ['debug_toolbar', ]
+MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]  # noqa: F405
+INSTALLED_APPS += ['debug_toolbar', ]                                # noqa: F405
 
 INTERNAL_IPS = ['127.0.0.1', '10.0.2.2', ]
 
