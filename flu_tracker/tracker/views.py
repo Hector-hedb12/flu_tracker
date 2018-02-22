@@ -8,8 +8,8 @@ from .forms import PolygonForm, TrackerForm
 
 class TrackerView(FormView):
     form_class = PolygonForm
-    template_name = 'world/tracker.html'
-    results_template_name = 'world/results.html'
+    template_name = 'tracker/tracker.html'
+    results_template_name = 'tracker/results.html'
     success_url = '/results/'
 
     def form_valid(self, form):

@@ -12,11 +12,10 @@ urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, admin.site.urls),
 
-    # User management
-    url(r'^users/', include('flu_tracker.users.urls', namespace='users')),
-    url(r'^accounts/', include('allauth.urls')),
 
-    url(r'^world/', include('flu_tracker.world.urls', namespace='world')),
+    url(r'^accounts/', include('allauth.urls')),
+    url(r'^tracker/', include('flu_tracker.tracker.urls', namespace='tracker')),
+    url(r'^users/', include('flu_tracker.users.urls', namespace='users')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

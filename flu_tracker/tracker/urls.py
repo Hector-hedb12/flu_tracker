@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
-app_name = 'world'
+app_name = 'tracker'
 urlpatterns = [
     url(
         regex=r'^$',

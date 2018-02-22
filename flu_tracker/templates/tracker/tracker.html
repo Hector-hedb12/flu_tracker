@@ -9,7 +9,7 @@
 {% endblock css %}
 
 {% block content %}
-<form class="form-horizontal" method="post" action="{% url 'world:list' %}">
+<form class="form-horizontal" method="post" action="{% url 'tracker:list' %}">
   {% csrf_token %}
   {{ form|crispy }}
   <div class="control-group">

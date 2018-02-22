@@ -48,7 +48,7 @@
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'world:list' %}">Tracker</a>
+              <a class="nav-link" href="{% url 'tracker:list' %}">Tracker</a>
             </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">

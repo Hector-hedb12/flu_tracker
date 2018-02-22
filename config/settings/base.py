@@ -54,6 +54,7 @@ THIRD_PARTY_APPS = [
 
 # Apps specific for this project go here.
 LOCAL_APPS = [
+    'flu_tracker.tracker.apps.TrackerConfig',
     'flu_tracker.users.apps.UsersConfig',
     'flu_tracker.world.apps.WorldConfig',
 ]
