@@ -27,6 +27,7 @@ class TrackerForm(forms.Form):
     collection = forms.GeometryCollectionField(
         widget=forms.OSMWidget(attrs={
             'map_width': 800,
-            'map_height': 500
+            'map_height': 500,
+            'disabled': True
         })
     )
