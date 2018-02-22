@@ -1,22 +1,15 @@
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views import View
+from django.views.generic.edit import FormView
 
-from .forms import PolygonForm
+from .forms import PolygonForm, TrackerForm, SAMPLE_COLLECTION
 
 
-class TrackerView(View):
+class TrackerView(FormView):
     form_class = PolygonForm
-    initial = {'key': 'value'}
     template_name = 'world/tracker.html'
+    results_template_name = 'world/results.html'
+    success_url = '/results/'
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class(initial=self.initial)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            return HttpResponseRedirect('/success/')
-
-        return render(request, self.template_name, {'form': form})
+    def form_valid(self, form):
+        result_form = TrackerForm(data={'collection': SAMPLE_COLLECTION})
+        return render(self.request, self.results_template_name, {'form': result_form})
