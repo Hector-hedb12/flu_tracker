@@ -4,6 +4,7 @@ from django.views.generic.edit import FormView
 
 
 from .forms import PolygonForm, TrackerForm
+from .utils import tweet_search
 
 
 class TrackerView(FormView):
@@ -14,8 +15,12 @@ class TrackerView(FormView):
 
     def form_valid(self, form):
         polygon = form.cleaned_data.get('poly')
+
+        points = tweet_search(polygon)
+        points_str = ', '.join(p.wkt for p in points)
+
         collection = GEOSGeometry(
-            'GEOMETRYCOLLECTION({})'.format(polygon.wkt),
+            'GEOMETRYCOLLECTION({}, {})'.format(polygon.wkt, points_str),
             srid=polygon.srid
         )
 
