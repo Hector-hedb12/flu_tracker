@@ -5,19 +5,32 @@ import pytz
 from django.conf import settings
 from django.contrib.gis.geos import Point
 
-from tweepy import OAuthHandler, API, RateLimitError, Cursor
+from tweepy import OAuthHandler, API, Cursor
 from tweepy.error import TweepError
 
 
 EST = pytz.timezone('America/New_York')
 
 
-def limit_handled(cursor):
-    while True:
-        try:
-            yield cursor.next()
-        except RateLimitError:
-            sleep(15 * 60)      # 15 minutes
+def get_point_from_status(status):
+    # x: longitude, y: latitude
+
+    if status.geo:
+        coordinates = status.geo['coordinates']
+        return Point(x=coordinates[1], y=coordinates[0], srid=4326).transform(3857, clone=True)
+
+    if status.coordinates:
+        coordinates = status.geo['coordinates']
+        return Point(x=coordinates[0], y=coordinates[1], srid=4326).transform(3857, clone=True)
+
+    if status.place:
+        coordinates = status.place.bounding_box.coordinates[0][0]
+        return Point(x=coordinates[0], y=coordinates[1], srid=4326).transform(3857, clone=True)
+
+    # get coordinates from user's profile
+    coordinates = status.author.location
+    # print(coordinates)
+    return None
 
 
 def tweet_search(polygon):
@@ -41,6 +54,7 @@ def tweet_search(polygon):
     wgs84_centroid = centroid.transform(4326, clone=True)  # EPSG:4326 (WGS84)
     geocode = '{},{},{}km'.format(wgs84_centroid.y, wgs84_centroid.x, max_distance / 1000)
 
+    # perform query
     auth = OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     auth.set_access_token(settings.TWITTER_ACCESS_TOKEN_KEY, settings.TWITTER_ACCESS_TOKEN_SECRET)
 
@@ -54,9 +68,14 @@ def tweet_search(polygon):
         geocode=geocode,
     )
 
+    # process query
+    result = []
     try:
-        for status in cursor.items():
-            print(status.text)
+        for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
+            point = get_point_from_status(status)
+            if point:
+                result.append(point)
+
     except TweepError:
         status = api.rate_limit_status()['resources']['search']
         next_time = datetime.fromtimestamp(status['/search/tweets']['reset']).replace(tzinfo=EST)
@@ -64,4 +83,6 @@ def tweet_search(polygon):
         print('#### TweepError ####')
         print('Try again at {}'.format(next_time))
 
-    return []
+        # sleep(15 * 60)      # 15 minutes
+
+    return result
