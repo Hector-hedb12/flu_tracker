@@ -47,4 +47,5 @@ redis>=2.10.5
 
 
 
-# Your custom requirements go here
+# Twitter
+tweepy==3.5.0
