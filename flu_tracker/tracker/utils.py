@@ -1,5 +1,7 @@
 from time import sleep
 from datetime import datetime
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 import pytz
 
 from django.conf import settings
@@ -10,6 +12,7 @@ from tweepy.error import TweepError
 
 
 EST = pytz.timezone('America/New_York')
+geolocator = Nominatim()
 
 
 def get_point_from_status(status):
@@ -28,8 +31,14 @@ def get_point_from_status(status):
         return Point(x=coordinates[0], y=coordinates[1], srid=4326).transform(3857, clone=True)
 
     # get coordinates from user's profile
-    coordinates = status.author.location
-    # print(coordinates)
+    try:
+        location = geolocator.geocode(status.author.location)
+    except GeocoderTimedOut:
+        return None
+
+    if location:
+        return Point(x=location.longitude, y=location.latitude, srid=4326).transform(3857, clone=True)
+
     return None
 
 
@@ -73,7 +82,7 @@ def tweet_search(polygon):
     try:
         for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
             point = get_point_from_status(status)
-            if point:
+            if point and polygon.contains(point):
                 result.append(point)
 
     except TweepError:
@@ -83,6 +92,6 @@ def tweet_search(polygon):
         print('#### TweepError ####')
         print('Try again at {}'.format(next_time))
 
-        # sleep(15 * 60)      # 15 minutes
+        sleep(15 * 60)      # 15 minutes
 
     return result
