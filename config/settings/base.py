@@ -274,3 +274,15 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+# Twitter API
+# ------------
+
+TWITTER_CONSUMER_KEY = env('TWITTER_CONSUMER_KEY', default='TWITTER_CONSUMER_KEY')
+TWITTER_CONSUMER_SECRET = env('TWITTER_CONSUMER_SECRET', default='TWITTER_CONSUMER_SECRET')
+TWITTER_ACCESS_TOKEN_KEY = env('TWITTER_ACCESS_TOKEN_KEY', default='TWITTER_ACCESS_TOKEN_KEY')
+TWITTER_ACCESS_TOKEN_SECRET = env('TWITTER_ACCESS_TOKEN_SECRET', default='TWITTER_ACCESS_TOKEN_SECRET')
+
+TWITTER_QUERY = 'flu -rt -http'
+TWITTER_QUERY_LANGUAGE = 'en'
+TWITTER_QUERY_TWEETS_PER_PAGE = 100
