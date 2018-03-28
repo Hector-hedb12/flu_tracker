@@ -287,3 +287,8 @@ TWITTER_ACCESS_TOKEN_SECRET = env('TWITTER_ACCESS_TOKEN_SECRET', default='TWITTE
 TWITTER_QUERY = 'flu -rt -http'
 TWITTER_QUERY_LANGUAGE = 'en'
 TWITTER_QUERY_TWEETS_PER_PAGE = 100
+
+
+# LEARNING
+# ------------
+DATASET_DIR = APPS_DIR.path('classifiers').path('dataset')

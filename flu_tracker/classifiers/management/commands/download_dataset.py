@@ -15,7 +15,6 @@ from django.core.management.base import BaseCommand
 
 
 EST = pytz.timezone('America/New_York')
-PATH_RESULT = settings.APPS_DIR.path('classifiers').path('dataset')
 
 
 def get_tweets(ids):
@@ -74,7 +73,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        makedirs(str(PATH_RESULT), exist_ok=True)
+        makedirs(str(settings.DATASET_DIR), exist_ok=True)
 
         fname = splitext(basename(options['file']))[0] + '.csv'
         data = {}
@@ -96,7 +95,7 @@ class Command(BaseCommand):
             labels.append(data[id])
 
         df = DataFrame({'text': texts, 'target': labels})
-        df.to_csv(str(PATH_RESULT.path(fname)), index=False)
+        df.to_csv(str(settings.DATASET_DIR.path(fname)), index=False)
 
         self.stdout.write(self.style.SUCCESS(
             'Read {} tweets from file {}'.format(len(result), options['file'])
