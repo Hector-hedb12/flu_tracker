@@ -85,7 +85,7 @@ class Command(BaseCommand):
             texts.append(result[id])
             labels.append(data[id])
 
-        df = DataFrame({'text': texts, 'class': labels})
+        df = DataFrame({'text': texts, 'target': labels})
         df.to_csv(str(PATH_RESULT.path(fname)), index=False)
 
         self.stdout.write(self.style.SUCCESS(
