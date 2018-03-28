@@ -292,3 +292,4 @@ TWITTER_QUERY_TWEETS_PER_PAGE = 100
 # LEARNING
 # ------------
 DATASET_DIR = APPS_DIR.path('classifiers').path('dataset')
+MODEL_DIR = APPS_DIR.path('classifiers').path('model')
