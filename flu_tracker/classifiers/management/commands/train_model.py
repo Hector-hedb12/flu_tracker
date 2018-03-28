@@ -25,38 +25,44 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         makedirs(str(settings.MODEL_DIR), exist_ok=True)
 
-        model = 'awareness-infection'
-        df_train = read_csv(str(settings.DATASET_DIR.path(model).path('train.csv')))
-        df_test = read_csv(str(settings.DATASET_DIR.path(model).path('test.csv')))
+        models = ['awareness-infection', 'related-notrelated', 'self-others']
+        for model in models:
+            self.stdout.write('')
+            self.stdout.write(model)
+            self.stdout.write('===================')
+            self.stdout.write('')
 
-        # 1.
-        classifier_pipeline = Pipeline([
-            ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
-            ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
-            ('classifier', MultinomialNB())          # Naive Bayes (NB)
-        ])
+            df_train = read_csv(str(settings.DATASET_DIR.path(model).path('train.csv')))
+            df_test = read_csv(str(settings.DATASET_DIR.path(model).path('test.csv')))
 
-        classifier = classifier_pipeline.fit(df_train.text, df_train.target)
-        predicted = classifier.predict(df_test.text)
-        accuracy = mean(predicted == df_test.target)
+            # 1.
+            classifier_pipeline = Pipeline([
+                ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
+                ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
+                ('classifier', MultinomialNB())          # Naive Bayes (NB)
+            ])
 
-        self.stdout.write('* {}: {}'.format('Naive Bayes', accuracy))
+            classifier = classifier_pipeline.fit(df_train.text, df_train.target)
+            predicted = classifier.predict(df_test.text)
+            accuracy = mean(predicted == df_test.target)
 
-        # 2.
-        classifier_pipeline = Pipeline([
-            ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
-            ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
-            ('svm', SGDClassifier(                   # Support Vector Machine
-                loss='hinge', penalty='l2', alpha=1e-3,
-                max_iter=5, random_state=42
-            ))
-        ])
+            self.stdout.write('* {}: {}'.format('Naive Bayes', accuracy))
 
-        classifier = classifier_pipeline.fit(df_train.text, df_train.target)
-        predicted = classifier.predict(df_test.text)
-        accuracy = mean(predicted == df_test.target)
+            # 2.
+            classifier_pipeline = Pipeline([
+                ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
+                ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
+                ('svm', SGDClassifier(                   # Support Vector Machine
+                    loss='hinge', penalty='l2', alpha=1e-3,
+                    max_iter=5, random_state=42
+                ))
+            ])
 
-        self.stdout.write('* {}: {}'.format('Support Vector Machine', accuracy))
+            classifier = classifier_pipeline.fit(df_train.text, df_train.target)
+            predicted = classifier.predict(df_test.text)
+            accuracy = mean(predicted == df_test.target)
 
-        # end
-        self.stdout.write(self.style.SUCCESS('Classifier trained'))
+            self.stdout.write('* {}: {}'.format('Support Vector Machine', accuracy))
+
+            # end
+            self.stdout.write(self.style.SUCCESS('Classifier trained'))
