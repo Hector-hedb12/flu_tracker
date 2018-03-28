@@ -2,10 +2,12 @@ from datetime import datetime
 from pandas import DataFrame
 from os import makedirs
 from os.path import basename, splitext
+from string import punctuation
 from time import sleep
 from tqdm import tqdm
 
 import pytz
+import re
 
 from tweepy import OAuthHandler, API
 from tweepy import TweepError, RateLimitError
@@ -15,6 +17,15 @@ from django.core.management.base import BaseCommand
 
 
 EST = pytz.timezone('America/New_York')
+URL_REGEX = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+
+
+def pre_process(text):
+    text = text.replace('\n', ' ').replace('\r', ' ')
+    text = re.sub(URL_REGEX, 'URL', text)
+    text = text.lower()
+    text = ''.join(ch for ch in text if ch not in punctuation)
+    return text
 
 
 def get_tweets(ids):
@@ -52,7 +63,7 @@ def get_tweets(ids):
             except TweepError:
                 error_getting_tweet = True
             else:
-                tweets[id] = tweet.text.replace('\n', ' ')
+                tweets[id] = pre_process(tweet.text)
             break
 
     if error_getting_tweet:
