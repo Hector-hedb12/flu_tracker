@@ -1,9 +1,9 @@
 from pandas import read_csv
 from os import makedirs
+from numpy import mean
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import SGDClassifier
-from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
@@ -25,20 +25,24 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         makedirs(str(settings.MODEL_DIR), exist_ok=True)
 
-        df = read_csv(
-            str(settings.DATASET_DIR.path('AwarenessVsInfection2012TweetIDs.csv'))
-        )
+        model = 'awareness-infection'
+        df_train = read_csv(str(settings.DATASET_DIR.path(model).path('train.csv')))
+        df_test = read_csv(str(settings.DATASET_DIR.path(model).path('test.csv')))
 
+        # 1.
         classifier_pipeline = Pipeline([
             ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
             ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
             ('classifier', MultinomialNB())          # Naive Bayes (NB)
         ])
 
-        scores = cross_val_score(classifier_pipeline, df.text, df.target, cv=5)
-        accuracy = 'accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), scores.std() * 2)
+        classifier = classifier_pipeline.fit(df_train.text, df_train.target)
+        predicted = classifier.predict(df_test.text)
+        accuracy = mean(predicted == df_test.target)
+
         self.stdout.write('* {}: {}'.format('Naive Bayes', accuracy))
 
+        # 2.
         classifier_pipeline = Pipeline([
             ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
             ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
@@ -48,8 +52,11 @@ class Command(BaseCommand):
             ))
         ])
 
-        scores = cross_val_score(classifier_pipeline, df.text, df.target, cv=5)
-        accuracy = 'accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), scores.std() * 2)
+        classifier = classifier_pipeline.fit(df_train.text, df_train.target)
+        predicted = classifier.predict(df_test.text)
+        accuracy = mean(predicted == df_test.target)
+
         self.stdout.write('* {}: {}'.format('Support Vector Machine', accuracy))
 
+        # end
         self.stdout.write(self.style.SUCCESS('Classifier trained'))
