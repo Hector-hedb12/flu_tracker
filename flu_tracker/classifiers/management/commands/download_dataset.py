@@ -31,20 +31,30 @@ def get_tweets(ids):
     ids = tqdm(ids, desc='Getting tweets')
 
     for id in ids:
-        try:
-            tweet = api.get_status(id)
-        except RateLimitError:
-            status = api.rate_limit_status()['resources']['statuses']
-            next_time = datetime.fromtimestamp(status['/statuses/show/:id']['reset'])
+        while True:
+            try:
+                tweet = api.get_status(id)
+            except RateLimitError:
+                status = api.rate_limit_status()['resources']['statuses']
+                next_time = datetime.fromtimestamp(status['/statuses/show/:id']['reset'])
 
-            print('Rate limit exceeded. Trying again at {} ...'.format(next_time.replace(tzinfo=EST)))
+                print('Rate limit exceeded. Trying again at ({}) --> {} ...'.format(
+                    status['/statuses/show/:id']['reset'],
+                    next_time.replace(tzinfo=pytz.utc).astimezone(EST)
+                ))
 
-            waiting_sec = (next_time - datetime.now()).total_seconds()
-            sleep(waiting_sec)
-        except TweepError:
-            error_getting_tweet = True
-        else:
-            tweets[id] = tweet.text
+                waiting_sec = (next_time - datetime.now()).total_seconds() + 5
+                sleep(waiting_sec)
+
+                print('Trying id={} again ...'.format(id))
+
+                continue
+
+            except TweepError:
+                error_getting_tweet = True
+            else:
+                tweets[id] = tweet.text.replace('\n', ' ')
+            break
 
     if error_getting_tweet:
         print('It was not possible to retrieve {} tweets ...'.format(len(ids) - len(tweets.keys())))
