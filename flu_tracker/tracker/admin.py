@@ -5,7 +5,7 @@ from .models import Tweet
 
 
 @admin.register(Tweet)
-class TweetAdmin(admin.ModelAdmin):
+class TweetAdmin(admin.OSMGeoAdmin):
     list_display = ('ref', 'created', 'view_on_twitter')
     actions = None
 
