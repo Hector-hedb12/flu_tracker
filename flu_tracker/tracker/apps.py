@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class TrackerConfig(AppConfig):
-    name = 'tracker'
+    name = 'flu_tracker.tracker'
+    verbose_name = 'Tracker'
