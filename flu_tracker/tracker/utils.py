@@ -1,7 +1,7 @@
 from time import sleep
 from datetime import datetime
 from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
+from geopy.exc import GeocoderTimedOut, GeocoderUnavailable
 import pytz
 
 from django.conf import settings
@@ -33,7 +33,7 @@ def get_point_from_status(status):
     # get coordinates from user's profile
     try:
         location = geolocator.geocode(status.author.location)
-    except GeocoderTimedOut:
+    except (GeocoderTimedOut, GeocoderUnavailable):
         return None
 
     if location:
