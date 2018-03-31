@@ -11,6 +11,136 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 
+CLASS_NAMES = {
+    MultinomialNB: 'Naive-Bayes',
+    SGDClassifier: 'Support-Vector-Machine',
+}
+
+
+MODEL_CLASSES = {
+    'awareness-infection': [MultinomialNB, SGDClassifier],
+    'related-notrelated': [MultinomialNB, SGDClassifier],
+    'self-others': [MultinomialNB, SGDClassifier],
+}
+
+MODEL_PARAMETERS = {
+    'awareness-infection': [
+        {                       # MultinomialNB
+            'vectorizer': {
+                'ngram_range': (1, 3),
+                'stop_words': None,
+            },
+            'term_frequency': {
+                'smooth_idf': True,
+                'sublinear_tf': True,
+                'use_idf': False,
+                'norm': 'l2',
+            },
+            'classifier': {
+                'alpha': 0.1,
+                'fit_prior': True,
+            }
+        },
+        {                       # SGDClassifier
+            'vectorizer': {
+                'ngram_range': (1, 3),
+                'stop_words': None,
+            },
+            'term_frequency': {
+                'sublinear_tf': False,
+                'smooth_idf': False,
+                'norm': 'l1',
+                'use_idf': True,
+            },
+            'classifier': {
+                'alpha': 1e-05,
+                'penalty': 'l1',
+                'warm_start': True,
+                'fit_intercept': False,
+                'shuffle': True,
+                'loss': 'hinge',
+            }
+        }
+    ],
+    'related-notrelated': [
+        {                       # MultinomialNB
+            'vectorizer': {
+                'ngram_range': (1, 1),
+                'stop_words': None,
+            },
+            'term_frequency': {
+                'smooth_idf': True,
+                'sublinear_tf': True,
+                'use_idf': False,
+                'norm': 'l1',
+            },
+            'classifier': {
+                'alpha': 0.1,
+                'fit_prior': False,
+            }
+        },
+        {                       # SGDClassifier
+            'vectorizer': {
+                'ngram_range': (1, 3),
+                'stop_words': None,
+            },
+            'term_frequency': {
+                'sublinear_tf': False,
+                'smooth_idf': True,
+                'norm': 'l2',
+                'use_idf': True,
+            },
+            'classifier': {
+                'alpha': 0.0001,
+                'penalty': 'l1',
+                'warm_start': True,
+                'fit_intercept': True,
+                'shuffle': False,
+                'loss': 'log',
+            }
+        }
+    ],
+    'self-others': [
+        {                       # MultinomialNB
+            'vectorizer': {
+                'ngram_range': (1, 2),
+                'stop_words': None,
+            },
+            'term_frequency': {
+                'smooth_idf': True,
+                'sublinear_tf': True,
+                'use_idf': False,
+                'norm': 'l1',
+            },
+            'classifier': {
+                'alpha': 0.01,
+                'fit_prior': False,
+            }
+        },
+        {                       # SGDClassifier
+            'vectorizer': {
+                'ngram_range': (1, 3),
+                'stop_words': None
+            },
+            'term_frequency': {
+                'sublinear_tf': False,
+                'smooth_idf': True,
+                'norm': 'l1',
+                'use_idf': True,
+            },
+            'classifier': {
+                'alpha': 1e-05,
+                'penalty': 'none',
+                'warm_start': True,
+                'fit_intercept': True,
+                'shuffle': True,
+                'loss': 'hinge',
+            }
+        }
+    ],
+}
+
+
 class Command(BaseCommand):
     help = 'Train the specified model'
 
@@ -25,8 +155,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         makedirs(str(settings.MODEL_DIR), exist_ok=True)
 
-        models = ['awareness-infection', 'related-notrelated', 'self-others']
-        for model in models:
+        for model in MODEL_CLASSES:
             self.stdout.write('')
             self.stdout.write(model)
             self.stdout.write('===================')
@@ -35,34 +164,23 @@ class Command(BaseCommand):
             df_train = read_csv(str(settings.DATASET_DIR.path(model).path('train.csv')))
             df_test = read_csv(str(settings.DATASET_DIR.path(model).path('test.csv')))
 
-            # 1.
-            classifier_pipeline = Pipeline([
-                ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
-                ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
-                ('classifier', MultinomialNB())          # Naive Bayes (NB)
-            ])
+            for i, cls_model in enumerate(MODEL_CLASSES[model]):
+                classifier_pipeline = Pipeline([             # text --> matrix of token counts
+                    ('vectorizer', CountVectorizer(
+                        **MODEL_PARAMETERS[model][i]['vectorizer']
+                    )),
+                    ('term_frequency', TfidfTransformer(     # count matrix -->  normalized TF or TF-IDF
+                        **MODEL_PARAMETERS[model][i]['term_frequency']
+                    )),
+                    ('classifier', cls_model(                # Naive Bayes (NB) or Support Vector Machine
+                        **MODEL_PARAMETERS[model][i]['classifier']
+                    ))
+                ])
 
-            classifier = classifier_pipeline.fit(df_train.text, df_train.target)
-            predicted = classifier.predict(df_test.text)
-            accuracy = mean(predicted == df_test.target)
+                classifier = classifier_pipeline.fit(df_train.text, df_train.target)
+                predicted = classifier.predict(df_test.text)
+                accuracy = mean(predicted == df_test.target)
 
-            self.stdout.write('* {}: {}'.format('Naive Bayes', accuracy))
+                self.stdout.write('* {}: {}'.format(CLASS_NAMES[cls_model], accuracy))
 
-            # 2.
-            classifier_pipeline = Pipeline([
-                ('vectorizer', CountVectorizer()),       # text --> matrix of token counts
-                ('term_frequency', TfidfTransformer()),  # count matrix -->  normalized TF or TF-IDF
-                ('svm', SGDClassifier(                   # Support Vector Machine
-                    loss='hinge', penalty='l2', alpha=1e-3,
-                    max_iter=5, random_state=42
-                ))
-            ])
-
-            classifier = classifier_pipeline.fit(df_train.text, df_train.target)
-            predicted = classifier.predict(df_test.text)
-            accuracy = mean(predicted == df_test.target)
-
-            self.stdout.write('* {}: {}'.format('Support Vector Machine', accuracy))
-
-            # end
-            self.stdout.write(self.style.SUCCESS('Classifier trained'))
+            self.stdout.write(self.style.SUCCESS('Classifiers trained'))
