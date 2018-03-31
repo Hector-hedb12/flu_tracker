@@ -27,49 +27,36 @@ MODEL_PARAMETERS = {
     'awareness-infection': [
         {                       # MultinomialNB
             'vectorizer': {
-                'ngram_range': (1, 3),
-                'stop_words': None,
+                'ngram_range': (1, 3)
             },
             'term_frequency': {
-                'smooth_idf': True,
                 'sublinear_tf': True,
-                'use_idf': False,
-                'norm': 'l2',
+                'use_idf': False
             },
             'classifier': {
-                'alpha': 0.1,
-                'fit_prior': True,
+                'alpha': 0.1
             }
         },
         {                       # SGDClassifier
             'vectorizer': {
-                'ngram_range': (1, 3),
-                'stop_words': None,
+                'ngram_range': (1, 3)
             },
             'term_frequency': {
-                'sublinear_tf': False,
                 'smooth_idf': False,
-                'norm': 'l1',
-                'use_idf': True,
+                'norm': 'l1'
             },
             'classifier': {
                 'alpha': 1e-05,
                 'penalty': 'l1',
                 'warm_start': True,
-                'fit_intercept': False,
-                'shuffle': True,
-                'loss': 'hinge',
+                'fit_intercept': False
             }
         }
     ],
     'related-notrelated': [
         {                       # MultinomialNB
-            'vectorizer': {
-                'ngram_range': (1, 1),
-                'stop_words': None,
-            },
+            'vectorizer': {},
             'term_frequency': {
-                'smooth_idf': True,
                 'sublinear_tf': True,
                 'use_idf': False,
                 'norm': 'l1',
@@ -81,20 +68,13 @@ MODEL_PARAMETERS = {
         },
         {                       # SGDClassifier
             'vectorizer': {
-                'ngram_range': (1, 3),
-                'stop_words': None,
+                'ngram_range': (1, 3)
             },
-            'term_frequency': {
-                'sublinear_tf': False,
-                'smooth_idf': True,
-                'norm': 'l2',
-                'use_idf': True,
-            },
+            'term_frequency': {},
             'classifier': {
                 'alpha': 0.0001,
                 'penalty': 'l1',
                 'warm_start': True,
-                'fit_intercept': True,
                 'shuffle': False,
                 'loss': 'log',
             }
@@ -103,11 +83,9 @@ MODEL_PARAMETERS = {
     'self-others': [
         {                       # MultinomialNB
             'vectorizer': {
-                'ngram_range': (1, 2),
-                'stop_words': None,
+                'ngram_range': (1, 2)
             },
             'term_frequency': {
-                'smooth_idf': True,
                 'sublinear_tf': True,
                 'use_idf': False,
                 'norm': 'l1',
@@ -119,22 +97,15 @@ MODEL_PARAMETERS = {
         },
         {                       # SGDClassifier
             'vectorizer': {
-                'ngram_range': (1, 3),
-                'stop_words': None
+                'ngram_range': (1, 3)
             },
             'term_frequency': {
-                'sublinear_tf': False,
-                'smooth_idf': True,
-                'norm': 'l1',
-                'use_idf': True,
+                'norm': 'l1'
             },
             'classifier': {
                 'alpha': 1e-05,
                 'penalty': 'none',
-                'warm_start': True,
-                'fit_intercept': True,
-                'shuffle': True,
-                'loss': 'hinge',
+                'warm_start': True
             }
         }
     ],
