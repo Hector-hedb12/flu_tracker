@@ -48,12 +48,9 @@ def tweet_search(polygon):
         for coords in polygon.boundary.array[1:]
     ]
 
-    # get the triangle centroid
-    x_points, y_points = zip(*border_points)
-    cx = sum(x_points) / len(border_points)
-    cy = sum(y_points) / len(border_points)
-
-    centroid = Point(x=cx, y=cy, srid=3857)
+    # get the polygon centroid
+    polygon_centroid = polygon.centroid
+    centroid = Point(x=polygon_centroid.x, y=polygon_centroid.y, srid=3857)
 
     # get radius for query
     max_distance = 0
@@ -81,7 +78,7 @@ def tweet_search(polygon):
     )
 
     # process query
-    result = []
+    result = [centroid]
     try:
         for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
             point = get_point_from_status(status)
