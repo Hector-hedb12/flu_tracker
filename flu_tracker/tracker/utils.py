@@ -10,6 +10,9 @@ from django.contrib.gis.geos import Point
 from tweepy import OAuthHandler, API, Cursor
 from tweepy.error import TweepError
 
+from flu_tracker.classifiers.utils import load_classifiers
+from .models import Tweet
+
 
 EST = pytz.timezone('America/New_York')
 geolocator = Nominatim()
@@ -77,13 +80,20 @@ def tweet_search(polygon):
         geocode=geocode,
     )
 
+    models = load_classifiers()
+
     # process query
     result = [centroid]
     try:
         for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
-            point = get_point_from_status(status)
-            if point and polygon.contains(point):
-                result.append(point)
+            text = status.text
+            if models['related-notrelated'].predict([text])[0] == 1 and \
+               models['awareness-infection'].predict([text])[0] == 0 and \
+               models['self-others'].predict([text])[0] == 1:
+                point = get_point_from_status(status)
+                if point and polygon.contains(point):
+                    Tweet.objects.create(ref=status.id, location=point)
+                    result.append(point)
 
     except TweepError:
         status = api.rate_limit_status()['resources']['search']
