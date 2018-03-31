@@ -4,7 +4,7 @@ from model_utils.models import TimeStampedModel
 
 
 class Tweet(TimeStampedModel, models.Model):
-    ref = models.CharField(max_length=15)
+    ref = models.CharField(max_length=25)
     location = models.PointField()
 
     def __str__(self):
