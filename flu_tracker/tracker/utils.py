@@ -43,7 +43,10 @@ def get_point_from_status(status):
 
 
 def tweet_search(polygon):
-    border_points = [Point(coords, srid=3857) for coords in polygon.boundary.array[1:]]  # EPSG:3857 (Pseudo-Mercator)
+    border_points = [
+        Point(x=coords[0], y=coords[1], srid=3857)  # EPSG:3857 (Pseudo-Mercator)
+        for coords in polygon.boundary.array[1:]
+    ]
 
     # get the triangle centroid
     x_points, y_points = zip(*border_points)
