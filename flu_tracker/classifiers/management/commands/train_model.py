@@ -1,4 +1,5 @@
 from pandas import read_csv
+from pickle import dump
 from os import makedirs
 from numpy import mean
 
@@ -104,5 +105,9 @@ class Command(BaseCommand):
             accuracy = mean(predicted == df_test.target)
 
             self.stdout.write('* {}: {}'.format(CLASS_NAMES[MODEL_CLASSES[model]], accuracy))
+
+            # save trained model
+            with open(str(settings.MODEL_DIR.path('{}-model.pkl'.format(model))), 'wb') as f:
+                dump(classifier, f)
 
         self.stdout.write(self.style.SUCCESS('Classifiers trained'))
