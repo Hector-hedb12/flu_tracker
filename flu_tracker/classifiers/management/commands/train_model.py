@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ...utils import plot_learning_curve
+from ...utils import plot_learning_curve, plot_validation_curve
 
 
 CLASS_NAMES = {
@@ -103,6 +103,8 @@ class Command(BaseCommand):
             ])
 
             plot_learning_curve(classifier_pipeline, model, df_train.text, df_train.target)
+            plot_validation_curve(classifier_pipeline, model, df_train.text, df_train.target,
+                                  'classifier__alpha', [0.0001, 0.001, 0.01, 0.1, 1.0, 2.0, 4.0, 6.0])
 
             classifier = classifier_pipeline.fit(df_train.text, df_train.target)
             predicted = classifier.predict(df_test.text)
