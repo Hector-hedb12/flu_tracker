@@ -33,3 +33,11 @@ sklearn==0.0
 # ---------
 
 tqdm==4.19.5
+
+
+# plotting
+# ---------
+
+cycler==0.10.0
+kiwisolver==1.0.1
+matplotlib==2.2.2
