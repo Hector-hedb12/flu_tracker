@@ -39,6 +39,8 @@ class Command(BaseCommand):
 
         classifiers = load_classifiers()
 
+        figures = {'awareness-infection': '-.', 'related-notrelated': '-', 'self-others': '--'}
+
         times = {
             'awareness-infection': [],
             'related-notrelated': [],
@@ -53,22 +55,23 @@ class Command(BaseCommand):
                 seconds = timeit(wrapped, number=1)
                 times[classifier].append(seconds)
 
+        fig = plt.figure()
+        title = 'Prediction Time Complexity'
+        plt.title(title)
+
+        for classifier in times:
+            plt.plot(ticks, times[classifier], figures[classifier], label=classifier)
+
+        plt.xlabel('Number of Samples')
+        plt.ylabel('Seconds')
+        plt.title(title)
+        plt.legend(loc='best')
+
+        # save figure
         directory = str(settings.MODEL_DIR.path('times'))
         makedirs(directory, exist_ok=True)
 
-        for classifier in times:
-            fig = plt.figure()
-            title = 'Prediction Time Complexity: {}'.format(classifier)
-            plt.title(title)
+        fig.savefig('{}/{}'.format(directory, title))
+        plt.close(fig)
 
-            plt.plot(ticks, times[classifier])
-
-            plt.xlabel('Number of Samples')
-            plt.ylabel('Seconds')
-            plt.title(title)
-
-            # save figure
-            fig.savefig('{}/{}'.format(directory, title))
-            plt.close(fig)
-
-        self.stdout.write(self.style.SUCCESS('Plottings saved at {}'.format(directory)))
+        self.stdout.write(self.style.SUCCESS('Plot saved at {}'.format(directory)))
