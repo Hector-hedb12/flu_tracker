@@ -7,7 +7,7 @@ import pytz
 from django.conf import settings
 from django.contrib.gis.geos import Point
 
-from tweepy import OAuthHandler, API, Cursor
+from tweepy import AppAuthHandler, API, Cursor
 from tweepy.error import TweepError
 
 from flu_tracker.classifiers.utils import load_classifiers
@@ -67,9 +67,7 @@ def tweet_search(polygon):
     geocode = '{},{},{}km'.format(wgs84_centroid.y, wgs84_centroid.x, max_distance / 1000)
 
     # perform query
-    auth = OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
-    auth.set_access_token(settings.TWITTER_ACCESS_TOKEN_KEY, settings.TWITTER_ACCESS_TOKEN_SECRET)
-
+    auth = AppAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     api = API(auth)
 
     cursor = Cursor(
