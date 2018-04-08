@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 
 from tweepy import AppAuthHandler, API, Cursor
-from tweepy.error import TweepError
+from tweepy import TweepError
 
 from flu_tracker.classifiers.utils import load_classifiers
 from .models import Tweet, AddressLocator
@@ -94,7 +94,7 @@ def tweet_search(polygon):
         )
 
         try:
-            for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
+            for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE*10):
                 text = status.text
                 if models['related-notrelated'].predict([text])[0] == 1 and \
                    models['awareness-infection'].predict([text])[0] == 0 and \
@@ -103,14 +103,17 @@ def tweet_search(polygon):
                     if point and polygon.contains(point):
                         Tweet.objects.create(ref=status.id, location=point)
                         result.append(point)
-
         except TweepError:
             status = api.rate_limit_status()['resources']['search']
-            next_time = datetime.fromtimestamp(status['/search/tweets']['reset']).replace(tzinfo=EST)
+            next_time = datetime.fromtimestamp(status['/search/tweets']['reset'])
 
-            print('#### TweepError ####')
-            print('Try again at {}'.format(next_time))
+            print('Rate limit exceeded. Trying again at ({}) --> {} ...'.format(
+                status['/search/tweets']['reset'],
+                next_time.replace(tzinfo=pytz.utc).astimezone(EST)
+            ))
 
-            sleep(15 * 60)      # 15 minutes
+            waiting_sec = (next_time - datetime.now()).total_seconds() + 5
+            sleep(waiting_sec)
 
+            print('Trying again ...')
     return result
