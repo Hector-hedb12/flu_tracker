@@ -70,36 +70,38 @@ def tweet_search(polygon):
     auth = AppAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     api = API(auth)
 
-    cursor = Cursor(
-        api.search,
-        q=settings.TWITTER_QUERY,
-        lang=settings.TWITTER_QUERY_LANGUAGE,
-        rpp=settings.TWITTER_QUERY_TWEETS_PER_PAGE,
-        geocode=geocode,
-    )
-
     models = load_classifiers()
 
     # process query
     result = [centroid]
-    try:
-        for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
-            text = status.text
-            if models['related-notrelated'].predict([text])[0] == 1 and \
-               models['awareness-infection'].predict([text])[0] == 0 and \
-               models['self-others'].predict([text])[0] == 1:
-                point = get_point_from_status(status)
-                if point and polygon.contains(point):
-                    Tweet.objects.create(ref=status.id, location=point)
-                    result.append(point)
 
-    except TweepError:
-        status = api.rate_limit_status()['resources']['search']
-        next_time = datetime.fromtimestamp(status['/search/tweets']['reset']).replace(tzinfo=EST)
+    for query in settings.TWITTER_QUERIES:
+        cursor = Cursor(
+            api.search,
+            q=query,
+            lang=settings.TWITTER_QUERY_LANGUAGE,
+            rpp=settings.TWITTER_QUERY_TWEETS_PER_PAGE,
+            geocode=geocode,
+        )
 
-        print('#### TweepError ####')
-        print('Try again at {}'.format(next_time))
+        try:
+            for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
+                text = status.text
+                if models['related-notrelated'].predict([text])[0] == 1 and \
+                   models['awareness-infection'].predict([text])[0] == 0 and \
+                   models['self-others'].predict([text])[0] == 1:
+                    point = get_point_from_status(status)
+                    if point and polygon.contains(point):
+                        Tweet.objects.create(ref=status.id, location=point)
+                        result.append(point)
 
-        sleep(15 * 60)      # 15 minutes
+        except TweepError:
+            status = api.rate_limit_status()['resources']['search']
+            next_time = datetime.fromtimestamp(status['/search/tweets']['reset']).replace(tzinfo=EST)
+
+            print('#### TweepError ####')
+            print('Try again at {}'.format(next_time))
+
+            sleep(15 * 60)      # 15 minutes
 
     return result
