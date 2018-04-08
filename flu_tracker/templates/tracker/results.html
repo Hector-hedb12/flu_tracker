@@ -1,16 +1,19 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}Results{% endblock %}
 
 {% block css %}
-{{ block.super }}
-{{ form.media }}
+  <link href="{% static 'css/tracker/results.css' %}" rel="stylesheet">
+  {{ form.media }}
 {% endblock css %}
 
 {% block content %}
 <form method="post" action="{% url 'tracker:list' %}">
   {% csrf_token %}
   <div class="form-row justify-content-center">{{ form.collection }}</div>
+  <div class="form-row justify-content-center">
+    <a class="btn btn-primary" href="{% url 'tracker:list' %}" role="button">Query again</a>
+  </div>
 </form>
 {% endblock %}
