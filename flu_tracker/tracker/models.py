@@ -13,7 +13,7 @@ class Tweet(TimeStampedModel, models.Model):
 
 class AddressLocator(models.Model):
     address = models.CharField(max_length=255)
-    location = models.PointField()  # srid=3857
+    location = models.PointField(null=True)  # srid=3857
 
     def __str__(self):
         return '{}:{}'.format(self.address, self.location)
