@@ -29,3 +29,4 @@ class TweetAdmin(admin.OSMGeoAdmin):
 @admin.register(AddressLocator)
 class AddressLocatorAdmin(admin.OSMGeoAdmin):
     list_display = ('address', 'location',)
+    search_fields = ('address',)
