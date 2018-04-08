@@ -91,6 +91,7 @@ def tweet_search(polygon):
 
     # process query
     result = [centroid]
+    tweets = []
 
     # load addresses to memory
     for addr in AddressLocator.objects.all():
@@ -113,7 +114,7 @@ def tweet_search(polygon):
                    models['self-others'].predict([text])[0] == 1:
                     point = get_point_from_status(status)
                     if point and polygon.contains(point):
-                        Tweet.objects.create(ref=status.id, location=point)
+                        tweets.append(Tweet(ref=status.id, location=point))
                         result.append(point)
         except TweepError:
             status = api.rate_limit_status()['resources']['search']
@@ -128,4 +129,6 @@ def tweet_search(polygon):
             sleep(waiting_sec)
 
             print('Trying again ...')
+
+    Tweet.objects.bulk_create(tweets)
     return result
