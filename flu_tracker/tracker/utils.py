@@ -11,7 +11,7 @@ from tweepy import AppAuthHandler, API, Cursor
 from tweepy.error import TweepError
 
 from flu_tracker.classifiers.utils import load_classifiers
-from .models import Tweet
+from .models import Tweet, AddressLocator
 
 
 EST = pytz.timezone('America/New_York')
@@ -34,13 +34,22 @@ def get_point_from_status(status):
         return Point(x=coordinates[0], y=coordinates[1], srid=4326).transform(3857, clone=True)
 
     # get coordinates from user's profile
+    profile_address = status.author.location.upper()
+    address, created = AddressLocator.objects.get_or_create(address=profile_address)
+
+    if not created:
+        return address.location
+
     try:
-        location = geolocator.geocode(status.author.location)
+        location = geolocator.geocode(profile_address)
     except (GeocoderTimedOut, GeocoderUnavailable):
         return None
 
     if location:
-        return Point(x=location.longitude, y=location.latitude, srid=4326).transform(3857, clone=True)
+        pnt = Point(x=location.longitude, y=location.latitude, srid=4326).transform(3857, clone=True)
+        address.location = pnt
+        address.save()
+        return pnt
 
     return None
 
