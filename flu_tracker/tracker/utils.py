@@ -34,7 +34,7 @@ def get_point_from_status(status):
         return Point(x=coordinates[0], y=coordinates[1], srid=4326).transform(3857, clone=True)
 
     # get coordinates from user's profile
-    profile_address = status.author.location.upper()
+    profile_address = status.author.location.upper().strip()
     address, created = AddressLocator.objects.get_or_create(address=profile_address)
 
     if not created:
