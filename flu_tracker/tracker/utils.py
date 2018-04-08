@@ -16,6 +16,7 @@ from .models import Tweet, AddressLocator
 
 EST = pytz.timezone('America/New_York')
 geolocator = Nominatim()
+ADDRESS_DICT = {}
 
 
 def get_point_from_status(status):
@@ -35,9 +36,14 @@ def get_point_from_status(status):
 
     # get coordinates from user's profile
     profile_address = status.author.location.upper().strip()
+
+    if profile_address in ADDRESS_DICT:
+        return ADDRESS_DICT[profile_address]
+
     address, created = AddressLocator.objects.get_or_create(address=profile_address)
 
     if not created:
+        ADDRESS_DICT[profile_address] = address.location
         return address.location
 
     try:
@@ -49,6 +55,8 @@ def get_point_from_status(status):
         pnt = Point(x=location.longitude, y=location.latitude, srid=4326).transform(3857, clone=True)
         address.location = pnt
         address.save()
+
+        ADDRESS_DICT[profile_address] = pnt
         return pnt
 
     return None
@@ -83,6 +91,10 @@ def tweet_search(polygon):
 
     # process query
     result = [centroid]
+
+    # load addresses to memory
+    for addr in AddressLocator.objects.all():
+        ADDRESS_DICT[addr.address] = addr.location
 
     for query in settings.TWITTER_QUERIES:
         cursor = Cursor(
