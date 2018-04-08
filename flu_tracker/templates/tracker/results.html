@@ -9,8 +9,8 @@
 {% endblock css %}
 
 {% block content %}
-<form class="form-horizontal" method="post" action="{% url 'tracker:list' %}">
+<form method="post" action="{% url 'tracker:list' %}">
   {% csrf_token %}
-  {{ form.collection }}
+  <div class="form-row justify-content-center">{{ form.collection }}</div>
 </form>
 {% endblock %}

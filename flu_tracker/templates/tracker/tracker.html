@@ -1,20 +1,21 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}Tracker{% endblock %}
 
 {% block css %}
-  {{ block.super }}
+  <link href="{% static 'css/tracker/tracker.css' %}" rel="stylesheet">
   {{ form.media }}
 {% endblock css %}
 
 {% block content %}
-<form class="form-horizontal" method="post" action="{% url 'tracker:list' %}">
+<form method="post" action="{% url 'tracker:list' %}">
   {% csrf_token %}
-  {{ form.poly }}
-  <div class="control-group">
-    <div class="controls">
-      <button type="submit" class="btn">Retrieve</button>
+  <div class="form-row justify-content-center">{{ form.poly }}</div>
+  <div class="form-row justify-content-center">
+    <div class="col-auto">
+      <button type="button" class="btn btn-secondary" onClick="geodjango_poly.clearFeatures()">Reset</button>
+      <button type="submit" class="btn btn-primary">Query</button>
     </div>
   </div>
 </form>
