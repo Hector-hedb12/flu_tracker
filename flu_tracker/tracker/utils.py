@@ -94,7 +94,7 @@ def tweet_search(polygon):
         )
 
         try:
-            for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE*5):
+            for status in cursor.items(settings.TWITTER_QUERY_TWEETS_PER_PAGE):
                 text = status.text
                 if models['related-notrelated'].predict([text])[0] == 1 and \
                    models['awareness-infection'].predict([text])[0] == 0 and \
