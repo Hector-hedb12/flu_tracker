@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>
-  <b>Flu Tracker</b> is a project used to identify positive cases of influeza through the world using the Twitter API.
-</p>
-
-<p>
-  To start making queries, it is necessary to go <a href="{% url 'tracker:list' %}">here</a> and draw a valid polygon
-  on the area of interest. Every tweet content pass through a classification process trying to identify those cases showing
-  an infection message related to the author and discard others.
-</p>
+<div class="row justify-content-center">
+  <div class="col-8">
+    <p>
+      <b>Flu Tracker</b> is a project used to identify positive cases of influeza through the world using the Twitter API.
+    </p>
+    <p>
+      To start making queries, it is necessary to go <a href="{% url 'tracker:list' %}">here</a> and draw a valid polygon
+      on the area of interest. Every tweet content pass through a classification process trying to identify those cases showing
+      an infection message related to the author and discard others.
+    </p>
+  </div>
+</div>
 {% endblock %}
