@@ -9,3 +9,11 @@ class Tweet(TimeStampedModel, models.Model):
 
     def __str__(self):
         return '{}:{}'.format(self.ref, self.location)
+
+
+class AddressLocator(models.Model):
+    address = models.CharField(max_length=255)
+    location = models.PointField()  # srid=3857
+
+    def __str__(self):
+        return '{}:{}'.format(self.address, self.location)

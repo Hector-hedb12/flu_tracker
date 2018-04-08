@@ -1,7 +1,7 @@
 from django.contrib.gis import admin
 from django.utils.safestring import mark_safe
 
-from .models import Tweet
+from .models import Tweet, AddressLocator
 
 
 @admin.register(Tweet)
@@ -24,3 +24,8 @@ class TweetAdmin(admin.OSMGeoAdmin):
         )
     view_on_twitter.allow_tags = True
     view_on_twitter.short_description = 'View on Twitter'
+
+
+@admin.register(AddressLocator)
+class AddressLocatorAdmin(admin.OSMGeoAdmin):
+    list_display = ('address', 'location',)
