@@ -94,6 +94,8 @@ Project Installations
 
      $ python manage.py createsuperuser
 
+#. Set environment variables (see `.example.env` file)
+
 
 Run Project
 -----------
