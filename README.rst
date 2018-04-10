@@ -12,18 +12,6 @@ The Flu Tracker ...
 :License: MIT
 
 
-Project Layout
---------------
-
-This project follows the three-tired approach specified in
-*Two Scoops of Django - Best Practices for Django 2.0*::
-
-     <repository_root>/
-        <django_project_root>/
-           <configuration_root>/
-
-
-
 Pre-Installations
 -----------------
 
