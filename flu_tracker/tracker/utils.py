@@ -59,6 +59,7 @@ def get_point_from_status(status):
         ADDRESS_DICT[profile_address] = pnt
         return pnt
 
+    ADDRESS_DICT[profile_address] = None
     return None
 
 
